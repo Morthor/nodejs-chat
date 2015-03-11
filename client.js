@@ -1,5 +1,5 @@
 $(document).ready(function(){
-  var serverAddress = '172.23.0.238:3000';
+  var serverAddress = 'localhost:3000';
   var server = io.connect(serverAddress);
 
   $('#notification').text('');
