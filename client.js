@@ -22,6 +22,10 @@ $(document).ready(function(){
   server.on('connect', function(data){
     console.log('Connected to '+serverAddress);
   });
+
+  server.on('login', function(){
+    
+  });
   
   server.on('message', function(data){
     $('#messages').append($('<li>').html('<span class="nickname-span">'+data.nickname+': </span><span class="message-span">'+data.message+'</span>'));
@@ -29,9 +33,10 @@ $(document).ready(function(){
   });
 
   server.on('privateMessage', function(data){
-    $('#messages').append($('<li>').html('<span class="pvt-nickname-span">'+data.destinationUsername+'@you: </span><span class="pvt-message-span">'+data.message+'</span>'));
+    $('#messages').append($('<li>').html('<span class="pvt-nickname-span">'+data.username+'@you: </span><span class="pvt-message-span">'+data.message+'</span>'));
     $('#messages').scrollTop($('#messages')[0].scrollHeight)
     server.emit('privateMessage received', {destinationUser: data.username, originUserID: data.userID, originUsername: server.nickname, message: data.message});
+    console.log('receiver: '+server.nickname);
   });
 
   server.on('show privateMessage sent', function(data){
