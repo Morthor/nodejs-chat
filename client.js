@@ -1,9 +1,7 @@
 $(document).ready(function(){
-<<<<<<< HEAD
-  var serverAddress = '172.23.38.244:3000';
-=======
+
   var serverAddress = 'localhost:3000';
->>>>>>> 65491da5145252878ff60ca380f7b0d0f4e1be45
+
   var server = io.connect(serverAddress);
 
   $('#notification').text('');
