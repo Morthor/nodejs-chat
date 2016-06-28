@@ -1,5 +1,5 @@
 $(document).ready(function(){
-  var serverAddress = '172.23.0.238:3000';
+  var serverAddress = '172.23.38.244:3000';
   var server = io.connect(serverAddress);
 
   $('#notification').text('');
@@ -66,10 +66,12 @@ $(document).ready(function(){
 
   $('#message').keypress(function(e){
     if ( e.which == 13 ) {
+
       var message = $('#message').val();
       var user = $( "#user-list option:selected" ).val();
-      server.emit('message', {message: message, user: user});
-
+      if (message !== '') {
+        server.emit('message', {message: message, user: user});
+      }
       $('#message').val('');
     }        
   });

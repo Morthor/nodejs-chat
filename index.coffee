@@ -7,9 +7,12 @@ redisClient = redis.createClient()
 
 serverPort = 3000
 
-# This is a chat experiment with node, socket.io, express, redis and bootstrap on the frontend.
+###
+ This is a chat experiment with node, socket.io,
+ express, redis and bootstrap on the frontend.
+###
 
-# Root route
+### Root route ###
 app.get '/', (req, res) ->
   res.sendFile __dirname + '/html/index.html'
 
@@ -53,34 +56,52 @@ io.on 'connection', (client) ->
   client.on 'message', (data) ->
     nickname = client.nickname
 
-    # Differ message for all or private message
-    if data.user.toLowerCase() == 'all'
-      client.broadcast.emit 'message', {nickname: nickname, message: data.message}
-      client.emit 'message', {nickname: nickname, message: data.message}
-    else
-      # Retrieve user id from Redis
-      # console.log 'Retrieve user id from Redis'
-      try
-        redisClient.hget 'users', data.user.toLowerCase(), (err, obj) ->
-          destinationUserID = obj
-        # Send message to specific user
-          # console.log obj
-          if client.broadcast.to(destinationUserID)
-            # console.log 'pvt msgs from '+client.nickname+' to '+nickname
-            client.broadcast.to(destinationUserID).emit 'privateMessage', {userID: client.id, destinationUsername: data.user, username: client.nickname, message: data.message}
-          else
-            console.log 'Could not deliver message to user.'
-      catch error
-        console.log error
+    # Dont send empty messages
+    if data.message !== ''
+          
+      # Differ message for all or private message
+      if data.user.toLowerCase() == 'all'
+        client.broadcast.emit 'message', {
+          nickname: nickname,
+          message: data.message
+        }
+        client.emit 'message', {nickname: nickname, message: data.message}
+      else
+        # Retrieve user id from Redis
+        # console.log 'Retrieve user id from Redis'
+        try
+          redisClient.hget 'users', data.user.toLowerCase(), (err, obj) ->
+            destinationUserID = obj
+          # Send message to specific user
+            # console.log obj
+            if client.broadcast.to(destinationUserID)
+              # console.log 'pvt msgs from '+client.nickname+' to '+nickname
+              client.broadcast.to(destinationUserID).emit 'privateMessage', {
+                userID: client.id,
+                destinationUsername: data.user,
+                username: client.nickname,
+                message: data.message
+              }
+            else
+              console.log 'Could not deliver message to user.'
+        catch error
+          console.log error
 
   # Message delivery confirmation
   client.on 'privateMessage received', (data) ->
     if client.broadcast.to(data.originUserID)
       # Send message
-      client.broadcast.to(data.originUserID).emit 'show privateMessage sent', {nickname: data.originUsername, message: data.message}
+      client.broadcast.to(data.originUserID).emit 'show privateMessage sent', {
+        nickname: data.originUsername,
+        message: data.message
+      }
 
-  # The messages shouldn't be going back and forth for the delivery confirmation. They should be saved in redis and only the confirmation should go back and forth. 
-  # But for the sake of this experiment I did it in this simple manner.
+  ###
+    The messages shouldn't be going back and forth for
+    the delivery confirmation. They should be saved in
+    redis and only the confirmation should go back and forth.
+    For the sake of this experiment I did it in this simple manner.
+  ###
 
 
   # Client disconnection | Remove from user list on Redis
@@ -92,7 +113,7 @@ io.on 'connection', (client) ->
           if error
             console.log err
           # Update user list
-          message = nickname+' left'
+          message = client.nickname+' left'
           client.broadcast.emit 'notification', {message: message}
           try
             redisClient.hkeys 'users', (err, obj) ->
