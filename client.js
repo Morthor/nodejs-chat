@@ -1,5 +1,9 @@
 $(document).ready(function(){
+<<<<<<< HEAD
   var serverAddress = '172.23.38.244:3000';
+=======
+  var serverAddress = 'localhost:3000';
+>>>>>>> 65491da5145252878ff60ca380f7b0d0f4e1be45
   var server = io.connect(serverAddress);
 
   $('#notification').text('');
@@ -22,6 +26,10 @@ $(document).ready(function(){
   server.on('connect', function(data){
     console.log('Connected to '+serverAddress);
   });
+
+  server.on('login', function(){
+    
+  });
   
   server.on('message', function(data){
     $('#messages').append($('<li>').html('<span class="nickname-span">'+data.nickname+': </span><span class="message-span">'+data.message+'</span>'));
@@ -29,9 +37,10 @@ $(document).ready(function(){
   });
 
   server.on('privateMessage', function(data){
-    $('#messages').append($('<li>').html('<span class="pvt-nickname-span">'+data.destinationUsername+'@you: </span><span class="pvt-message-span">'+data.message+'</span>'));
+    $('#messages').append($('<li>').html('<span class="pvt-nickname-span">'+data.username+'@you: </span><span class="pvt-message-span">'+data.message+'</span>'));
     $('#messages').scrollTop($('#messages')[0].scrollHeight)
     server.emit('privateMessage received', {destinationUser: data.username, originUserID: data.userID, originUsername: server.nickname, message: data.message});
+    console.log('receiver: '+server.nickname);
   });
 
   server.on('show privateMessage sent', function(data){
@@ -69,7 +78,7 @@ $(document).ready(function(){
 
       var message = $('#message').val();
       var user = $( "#user-list option:selected" ).val();
-      if (message !== '') {
+      if (message != '') {
         server.emit('message', {message: message, user: user});
       }
       $('#message').val('');

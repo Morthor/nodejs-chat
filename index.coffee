@@ -30,25 +30,28 @@ io.on 'connection', (client) ->
 
   # Client joined chat
   client.on 'join', (nickname) ->
-    console.log('User '+nickname+' joined with id '+client.id)
-    client.nickname = nickname.toLowerCase()
+    if nickname == undefined || nickname == ''
+      client.emit 'login'
+    else
+      console.log('User '+nickname+' joined with id '+client.id)
+      client.nickname = nickname.toLowerCase()
 
-    # Add user to list on Redis
-    console.log 'Retrieve users from Redis'
-    try
-      redisClient.hset 'users', nickname.toLowerCase(), client.id, (err, obj) ->
-        message = nickname+' joined'
-        client.broadcast.emit 'notification', {message: message}
-        try
-          redisClient.hkeys 'users', (err, obj) ->
-            client.broadcast.emit 'update user list', obj
-            client.emit 'update user list', obj
-        catch error
-          console.log error
-    catch error
-      console.log error
-      # Update user list
-    console.log 'Retrieve keys from users list in Redis'
+      # Add user to list on Redis
+      console.log 'Retrieve users from Redis'
+      try
+        redisClient.hset 'users', nickname.toLowerCase(), client.id, (err, obj) ->
+          message = nickname+' joined'
+          client.broadcast.emit 'notification', {message: message}
+          try
+            redisClient.hkeys 'users', (err, obj) ->
+              client.broadcast.emit 'update user list', obj
+              client.emit 'update user list', obj
+          catch error
+            console.log error
+      catch error
+        console.log error
+        # Update user list
+      console.log 'Retrieve keys from users list in Redis'
     
           
   
@@ -57,7 +60,7 @@ io.on 'connection', (client) ->
     nickname = client.nickname
 
     # Dont send empty messages
-    if data.message !== ''
+    if data.message != ''
           
       # Differ message for all or private message
       if data.user.toLowerCase() == 'all'
@@ -89,6 +92,9 @@ io.on 'connection', (client) ->
 
   # Message delivery confirmation
   client.on 'privateMessage received', (data) ->
+    console.log 'privateMessage received'
+    console.log client.nickname
+    console.log data
     if client.broadcast.to(data.originUserID)
       # Send message
       client.broadcast.to(data.originUserID).emit 'show privateMessage sent', {
