@@ -24,6 +24,11 @@ app.get '/css', (req, res) ->
 app.get '/js', (req, res) ->
   res.sendFile __dirname + '/client.js'
 
+app.get '/messageHistory', (req, res) ->
+  res.setHeader('Content-Type', 'application/json');
+  res.send JSON.Stringify(redisClient.lrange 'messageHistory', 0, -1)
+  
+
 # Socket.io connection
 io.on 'connection', (client) ->
   console.log 'New connection -> '+client.id
@@ -69,6 +74,11 @@ io.on 'connection', (client) ->
           message: data.message
         }
         client.emit 'message', {nickname: nickname, message: data.message}
+
+        # Save message history
+        redisClient.rpush 'messageHistory', JSON.Stringify({nickname: nickname, message: data.message})
+
+        # {nickname: nickname, message: data.message}
       else
         # Retrieve user id from Redis
         # console.log 'Retrieve user id from Redis'
