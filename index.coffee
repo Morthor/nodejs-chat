@@ -26,7 +26,10 @@ app.get '/js', (req, res) ->
 
 app.get '/messageHistory', (req, res) ->
   res.setHeader('Content-Type', 'application/json');
-  res.send JSON.Stringify(redisClient.lrange 'messageHistory', 0, -1)
+  messageHistory = redisClient.lrange 'messageHistory', 0, -1
+  console.log messageHistory
+  console.log JSON.Stringify(messageHistory)
+  # res.send JSON.Stringify(redisClient.lrange 'messageHistory', 0, -1)
   
 
 # Socket.io connection
@@ -76,7 +79,7 @@ io.on 'connection', (client) ->
         client.emit 'message', {nickname: nickname, message: data.message}
 
         # Save message history
-        redisClient.rpush 'messageHistory', JSON.Stringify({nickname: nickname, message: data.message})
+        redisClient.rpush 'messageHistory', JSON.stringify({nickname: nickname, message: data.message})
 
         # {nickname: nickname, message: data.message}
       else
