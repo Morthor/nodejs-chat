@@ -26,10 +26,8 @@ app.get '/js', (req, res) ->
 
 app.get '/messageHistory', (req, res) ->
   res.setHeader('Content-Type', 'application/json');
-  messageHistory = redisClient.lrange 'messageHistory', 0, -1
-  console.log messageHistory
-  console.log JSON.Stringify(messageHistory)
-  # res.send JSON.Stringify(redisClient.lrange 'messageHistory', 0, -1)
+  redisClient.lrange 'messageHistory', 0, -1, (err, obj) ->
+    res.send obj
   
 
 # Socket.io connection
