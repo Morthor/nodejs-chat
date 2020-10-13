@@ -3,7 +3,7 @@ jQuery(function(){
   var server = io.connect(serverAddress);
 
   $('#notification').text('');
-  
+
   $('#new-user-form').on('submit', function(){
     if($('new-user-nickname').val() == ''){
       return false
@@ -70,7 +70,7 @@ jQuery(function(){
   });      
 
   $('#message').on('keypress', function(e){
-    if ( e.key == 13 ) {
+    if ( e.which == 13 ) {
 
       var message = $('#message').val();
       var user = $( "#user-list option:selected" ).val();
