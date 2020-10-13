@@ -1,18 +1,16 @@
-$(document).ready(function(){
-
+jQuery(function(){
   var serverAddress = 'localhost:3000';
-
   var server = io.connect(serverAddress);
 
   $('#notification').text('');
-
-  $('#new-user-form').submit(function(){
+  
+  $('#new-user-form').on('submit', function(){
     if($('new-user-nickname').val() == ''){
       return false
     }else{
       $('#join-window').hide();
       $('#chat-window').show();
-      $('#message').focus();
+      $('#message').trigger('focus');
       var nickname = $('#new-user-nickname').val();
        
       server.nickname = nickname;
@@ -71,8 +69,8 @@ $(document).ready(function(){
     $('#notification').text('disconnected');
   });      
 
-  $('#message').keypress(function(e){
-    if ( e.which == 13 ) {
+  $('#message').on('keypress', function(e){
+    if ( e.key == 13 ) {
 
       var message = $('#message').val();
       var user = $( "#user-list option:selected" ).val();
@@ -83,12 +81,12 @@ $(document).ready(function(){
     }        
   });
   
-  $("#new-user-form").submit(function(e) {
+  $("#new-user-form").on('submit', function(e) {
       e.preventDefault();
   });
 
-  $('#user-list').mouseup(function(){
-    $('#message').focus();
+  $('#user-list').on('mouseup', function(){
+    $('#message').trigger('focus');
     $('#destination').html('@'+$( "#user-list option:selected" ).val());
   });
 });
