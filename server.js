@@ -3,9 +3,17 @@
 
   app = require('express')();
   server = require('http').Server(app);
-  io = require('socket.io')(server);
+  io = require('socket.io')(server, { 
+    'cors': { 
+      'methods': ['GET', 'PATCH', 'POST', 'PUT'], 
+      'origin': true // accept from any domain 
+    } 
+  });
   redis = require('redis');
-  redisClient = redis.createClient();
+  redisClient = redis.createClient({
+    host: 'redis-server',
+    port: 6379
+  });
   serverPort = 3000;
   /*
     This is a chat experiment with node, socket.io,
