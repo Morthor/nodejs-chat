@@ -1,17 +1,27 @@
 (function() {
-  var app, io, redis, redisClient, server, serverPort;
+  var app, io, redis, redisClient, server, serverPort, bodyParser;
 
   app = require('express')();
   server = require('http').Server(app);
-  io = require('socket.io')(server);
+  io = require('socket.io')(server, {
+    'cors': {
+      'methods': ['GET', 'PATCH', 'POST', 'PUT'],
+      'origin': true // accept from any domain
+    }
+  });
   redis = require('redis');
-  redisClient = redis.createClient();
+  redisClient = redis.createClient({
+    host: 'redis-server',
+    port: 6379
+  });
+  bodyParser = require('body-parser')
   serverPort = 3000;
   /*
     This is a chat experiment with node, socket.io,
     express, redis and bootstrap on the frontend.
     */
 
+  app.use(bodyParser.urlencoded({extended : true}));
 
   /* Routes */
   app.get('/', function(req, res) {
@@ -29,6 +39,12 @@
   app.get('/messageHistory', function(req, res) {
     res.setHeader('Content-Type', 'application/json');
     return redisClient.lrange('messageHistory', 0, -1, function(err, obj) {
+      return res.send(obj);
+    });
+  });
+
+  app.post('/get_user_id', function(req, res){
+    return redisClient.hget('users', req.body.username, function(err, obj) {
       return res.send(obj);
     });
   });
@@ -117,7 +133,8 @@
       if (client.broadcast.to(data.originUserID)) {
         return client.broadcast.to(data.originUserID).emit('show privateMessage sent', {
           nickname: data.originUsername,
-          message: data.message
+          message: data.message,
+          userID: data.originUserID,
         });
       }
     });

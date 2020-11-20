@@ -1,5 +1,5 @@
 jQuery(function(){
-  var serverAddress = 'localhost:3000';
+  var serverAddress = location.hostname + ':3000';
   var server = io.connect(serverAddress);
 
   $('#notification').text('');
